@@ -12,10 +12,19 @@ It will read various parameters from your Cumulus.ini file, for example the MySQ
 
 **data/<monthlyfilename>** - this will import a single named monthly log file to your MySQL server
   
- Examples:
+ Windows examples:
  
  `> ExportToMySQL monthly`
  
  `> ExportToMySQL dayfile`
  
- `> ExportToMySQL data/Feb21log.txt`
+ `> ExportToMySQL data\Feb21log.txt`
+
+
+Linux examples:
+ 
+ `> mono ExportToMySQL.exe monthly`
+ 
+ `> mono ExportToMySQL.exe dayfile`
+ 
+ `> mono ExportToMySQL.exe data/Feb21log.txt`
