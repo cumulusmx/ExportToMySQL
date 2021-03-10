@@ -1,0 +1,10 @@
+Ver 1.2.1
+—————————
+- Fix: Batch mode working on Windows OS
+- Change: Improved MySQL login handing, now done once per run rather than per file
+
+
+Ver 1.2.0
+—————————
+- Initial release of ExportToMySQL in its new form
+- Thanks to Hans for contributing the batch mode

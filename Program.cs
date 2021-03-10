@@ -21,9 +21,12 @@ namespace ExportToMySQL
 
         private static string[] compassp = { "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW" };
 
+        private static MySqlCommand cmd;
+
         private static void Main(string[] args)
         {
             string param = "";
+            MySqlConnection mySqlConn = new MySqlConnection();
 
             if (args.Length == 0)
             {
@@ -73,6 +76,41 @@ namespace ExportToMySQL
                 compassp[15] = iniStrs.GetValue("Compass", "NNW", "NNW");
             }
 
+            try
+            {
+                mySqlConn = new MySqlConnection
+                {
+                    Host = MySqlHost,
+                    Port = MySqlPort,
+                    UserId = MySqlUser,
+                    Password = MySqlPass,
+                    Database = MySqlDatabase
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error encountered opening MySQL connection");
+                Console.WriteLine(ex.Message);
+                Environment.Exit(0);
+            }
+
+            cmd = new MySqlCommand
+            {
+                Connection = mySqlConn
+            };
+
+            try
+            {
+                mySqlConn.Open();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error encountered opening MySQL connection");
+                Console.WriteLine(ex.Message);
+                Environment.Exit(0);
+            }
+
+
             if (param.ToLower().Equals("dayfile"))
             {
                 doDayfileExport();
@@ -93,39 +131,16 @@ namespace ExportToMySQL
                 }
             }
 
+            mySqlConn.Close();
+
             Console.WriteLine();
         }
 
         private static void doSingleMonthlyExport(string filename)
         {
-            var mySqlConn = new MySqlConnection
-            {
-                Host = MySqlHost,
-                Port = MySqlPort,
-                UserId = MySqlUser,
-                Password = MySqlPass,
-                Database = MySqlDatabase
-            };
-
-            MySqlCommand cmd = new MySqlCommand
-            {
-                Connection = mySqlConn
-            };
-
             var StartOfMonthlyInsertSQL = "INSERT IGNORE INTO " + MySqlMonthlyTable + " (LogDateTime,Temp,Humidity,Dewpoint,Windspeed,Windgust,Windbearing,RainRate,TodayRainSoFar,Pressure,Raincounter,InsideTemp,InsideHumidity,LatestWindGust,WindChill,HeatIndex,UVindex,SolarRad,Evapotrans,AnnualEvapTran,ApparentTemp,MaxSolarRad,HrsSunShine,CurrWindBearing,RG11rain,RainSinceMidnight,FeelsLike,Humidex,WindbearingSym,CurrWindBearingSym)";
 
-            try
-            {
-                mySqlConn.Open();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error encountered opening MySQL connection");
-                Console.WriteLine(ex.Message);
-                Environment.Exit(0);
-            }
-
-            var InvC = new CultureInfo("");
+            //var InvC = new CultureInfo("");
 
             using (var sr = new StreamReader(filename))
             {
@@ -136,7 +151,7 @@ namespace ExportToMySQL
                 do
                 {
                     sb.Clear();
-                    sb.AppendLine(StartOfMonthlyInsertSQL + " Values");
+                    sb.Append(StartOfMonthlyInsertSQL + " Values ");
 
                     // now process each record in the file
                     try
@@ -176,7 +191,7 @@ namespace ExportToMySQL
                             sb.Append($"'{CompassPoint(Convert.ToInt32(st[7]))}',");
                             if (st.Count > 24 && !String.IsNullOrEmpty(st[24]))
                             {
-                                sb.AppendLine($"'{CompassPoint(Convert.ToInt32(st[24]))}'),");
+                                sb.Append($"'{CompassPoint(Convert.ToInt32(st[24]))}'),");
                             }
                             else
                             {
@@ -184,8 +199,8 @@ namespace ExportToMySQL
                             }
                         } // End For loop for the batch
 
-                        // remove the last "),"
-                        sb.Length -= 2;
+                        // remove the last ","
+                        sb.Length--;
                         sb.AppendLine(";");
 
                         cmd.CommandText = sb.ToString();
@@ -200,11 +215,7 @@ namespace ExportToMySQL
                         Console.WriteLine(ex.Message);
                     }
                 } while (!(sr.EndOfStream));
-
             }
-
-            mySqlConn.Close();
-
         }
 
         private static void doMonthlyExport()
@@ -229,20 +240,6 @@ namespace ExportToMySQL
 
         private static void doDayfileExport()
         {
-            var mySqlConn = new MySqlConnection
-            {
-                Host = MySqlHost,
-                Port = MySqlPort,
-                UserId = MySqlUser,
-                Password = MySqlPass,
-                Database = MySqlDatabase
-            };
-
-            MySqlCommand cmd = new MySqlCommand
-            {
-                Connection = mySqlConn
-            };
-
             var filename = "data" + Path.DirectorySeparatorChar + "dayfile.txt";
 
             Console.WriteLine("Exporting dayfile: "+filename);
@@ -251,17 +248,6 @@ namespace ExportToMySQL
             {
                 Console.WriteLine("Dayfile exists, beginning export");
                 string StartOfDayfileInsertSQL = "INSERT IGNORE INTO " + MySqlDayfileTable + " (LogDate,HighWindGust,HWindGBear,THWindG,MinTemp,TMinTemp,MaxTemp,TMaxTemp,MinPress,TMinPress,MaxPress,TMaxPress,MaxRainRate,TMaxRR,TotRainFall,AvgTemp,TotWindRun,HighAvgWSpeed,THAvgWSpeed,LowHum,TLowHum,HighHum,THighHum,TotalEvap,HoursSun,HighHeatInd,THighHeatInd,HighAppTemp,THighAppTemp,LowAppTemp,TLowAppTemp,HighHourRain,THighHourRain,LowWindChill,TLowWindChill,HighDewPoint,THighDewPoint,LowDewPoint,TLowDewPoint,DomWindDir,HeatDegDays,CoolDegDays,HighSolarRad,THighSolarRad,HighUV,THighUV,MaxFeelsLike,TMaxFeelsLike,MinFeelsLike,TMinFeelsLike,MaxHumidex,TMaxHumidex,HWindGBearSym,DomWindDirSym)";
-
-                try
-                {
-                    mySqlConn.Open();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error encountered opening MySQL connection");
-                    Console.WriteLine(ex.Message);
-                    Environment.Exit(0);
-                }
 
                 int linenum = 0;
 
@@ -272,7 +258,6 @@ namespace ExportToMySQL
                     do
                     {
                         // now process each record in the file
-
                         try
                         {
                             var line = sr.ReadLine();
@@ -322,13 +307,10 @@ namespace ExportToMySQL
                             Console.WriteLine(ex.Message);
                         }
                     } while (!(sr.EndOfStream));
-
                 }
 
                 Console.WriteLine();
                 Console.WriteLine(linenum+" entries processed");
-
-                mySqlConn.Close();
             }
         }
 
