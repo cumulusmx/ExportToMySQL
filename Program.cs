@@ -220,13 +220,13 @@ namespace ExportToMySQL
 
         private static void doMonthlyExport()
         {
-            for (int y = 0; y < 100; y++)
+            for (int y = 2000; y < 2100; y++)
             {
                 for (int m = 1; m < 12; m++)
                 {
-                    DateTime logfiledate = new DateTime(y+2000,m,1);
+                    DateTime logfiledate = new DateTime(y, m, 1);
 
-                    var datestring = logfiledate.ToString("MMMyy");
+                    var datestring = logfiledate.ToString("MMMyy").Replace(".", "");
 
                     var filename = "data" + Path.DirectorySeparatorChar + datestring + "log.txt";
 
