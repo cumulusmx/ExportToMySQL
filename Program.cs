@@ -140,8 +140,6 @@ namespace ExportToMySQL
         {
             var StartOfMonthlyInsertSQL = "INSERT IGNORE INTO " + MySqlMonthlyTable + " (LogDateTime,Temp,Humidity,Dewpoint,Windspeed,Windgust,Windbearing,RainRate,TodayRainSoFar,Pressure,Raincounter,InsideTemp,InsideHumidity,LatestWindGust,WindChill,HeatIndex,UVindex,SolarRad,Evapotrans,AnnualEvapTran,ApparentTemp,MaxSolarRad,HrsSunShine,CurrWindBearing,RG11rain,RainSinceMidnight,FeelsLike,Humidex,WindbearingSym,CurrWindBearingSym)";
 
-            //var InvC = new CultureInfo("");
-
             using (var sr = new StreamReader(filename))
             {
                 const int MaxBatchSize = 1000;
@@ -179,9 +177,9 @@ namespace ExportToMySQL
 
                             for (int i = 2; i < 29; i++)
                             {
-                                if (i < st.Count && !String.IsNullOrEmpty(st[i]))
+                                if (i < st.Count && !string.IsNullOrEmpty(st[i]))
                                 {
-                                    sb.Append($"'{st[i]}',");
+                                    sb.Append($"'{st[i].Replace(',', '.')}',");
                                 }
                                 else
                                 {
@@ -189,7 +187,7 @@ namespace ExportToMySQL
                                 }
                             }
                             sb.Append($"'{CompassPoint(Convert.ToInt32(st[7]))}',");
-                            if (st.Count > 24 && !String.IsNullOrEmpty(st[24]))
+                            if (st.Count > 24 && !string.IsNullOrEmpty(st[24]))
                             {
                                 sb.Append($"'{CompassPoint(Convert.ToInt32(st[24]))}'),");
                             }
@@ -276,9 +274,9 @@ namespace ExportToMySQL
 
                             for (int i = 1; i < 52; i++)
                             {
-                                if (i < st.Count && !String.IsNullOrEmpty(st[i]))
+                                if (i < st.Count && !string.IsNullOrEmpty(st[i]))
                                 {
-                                    sb.Append("'" + st[i] + "',");
+                                    sb.Append("'" + st[i].Replace(',', '.') + "',");
                                 }
                                 else
                                 {
@@ -286,7 +284,7 @@ namespace ExportToMySQL
                                 }
                             }
                             sb.Append("'" + CompassPoint(Convert.ToInt32(st[2])) + "',");
-                            if (st.Count > 39 && !String.IsNullOrEmpty(st[39]))
+                            if (st.Count > 39 && !string.IsNullOrEmpty(st[39]))
                             {
                                 sb.Append("'" + CompassPoint(Convert.ToInt32(st[39])) + "')");
                             }

@@ -1,3 +1,8 @@
+ver 1.2.3
+—————————
+- Fix: Inserts where the user locale uses comma decimals
+
+
 ver 1.2.2
 —————————
 - Fix: Reading all log files failed for locales that use a "." in the abbreviated month name
