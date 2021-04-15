@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using CumulusMX;
-using Devart.Data.MySql;
+using MySqlConnector;
 
 namespace ExportToMySQL
 {
@@ -78,14 +78,7 @@ namespace ExportToMySQL
 
             try
             {
-                mySqlConn = new MySqlConnection
-                {
-                    Host = MySqlHost,
-                    Port = MySqlPort,
-                    UserId = MySqlUser,
-                    Password = MySqlPass,
-                    Database = MySqlDatabase
-                };
+                mySqlConn = new MySqlConnection($"server={MySqlHost};port={MySqlPort};user={MySqlUser};password={MySqlPass};database={MySqlDatabase}");
             }
             catch (Exception ex)
             {
@@ -113,17 +106,17 @@ namespace ExportToMySQL
 
             if (param.ToLower().Equals("dayfile"))
             {
-                doDayfileExport();
+                DoDayfileExport();
             }
             else if (param.ToLower().Equals("monthly"))
             {
-                doMonthlyExport();
+                DoMonthlyExport();
             }
             else
             {
                 if (File.Exists(param))
                 {
-                    doSingleMonthlyExport(param);
+                    DoSingleMonthlyExport(param);
                 }
                 else
                 {
@@ -136,7 +129,7 @@ namespace ExportToMySQL
             Console.WriteLine();
         }
 
-        private static void doSingleMonthlyExport(string filename)
+        private static void DoSingleMonthlyExport(string filename)
         {
             var StartOfMonthlyInsertSQL = "INSERT IGNORE INTO " + MySqlMonthlyTable + " (LogDateTime,Temp,Humidity,Dewpoint,Windspeed,Windgust,Windbearing,RainRate,TodayRainSoFar,Pressure,Raincounter,InsideTemp,InsideHumidity,LatestWindGust,WindChill,HeatIndex,UVindex,SolarRad,Evapotrans,AnnualEvapTran,ApparentTemp,MaxSolarRad,HrsSunShine,CurrWindBearing,RG11rain,RainSinceMidnight,FeelsLike,Humidex,WindbearingSym,CurrWindBearingSym)";
 
@@ -216,7 +209,7 @@ namespace ExportToMySQL
             }
         }
 
-        private static void doMonthlyExport()
+        private static void DoMonthlyExport()
         {
             for (int y = 2000; y < 2100; y++)
             {
@@ -230,13 +223,13 @@ namespace ExportToMySQL
 
                     if (File.Exists(filename))
                     {
-                        doSingleMonthlyExport(filename);
+                        DoSingleMonthlyExport(filename);
                     }
                 }
             }
         }
 
-        private static void doDayfileExport()
+        private static void DoDayfileExport()
         {
             var filename = "data" + Path.DirectorySeparatorChar + "dayfile.txt";
 
