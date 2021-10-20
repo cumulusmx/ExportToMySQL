@@ -1,3 +1,11 @@
+ver 1.3.1
+—————————
+- Fix: Bug that prevented December being imported when performing an import of all files
+
+ver 1.3.0
+—————————
+- Supports the library changes in Cumulus MX v3.11.0 with a swap to MySqlConnector
+
 ver 1.2.3
 —————————
 - Fix: Inserts where the user locale uses comma decimals

@@ -213,7 +213,7 @@ namespace ExportToMySQL
         {
             for (int y = 2000; y < 2100; y++)
             {
-                for (int m = 1; m < 12; m++)
+                for (int m = 1; m <= 12; m++)
                 {
                     DateTime logfiledate = new DateTime(y, m, 1);
 
