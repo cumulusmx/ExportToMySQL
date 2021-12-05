@@ -11,11 +11,6 @@ namespace ExportToMySQL
 {
     internal class Program
     {
-        private static string MySqlHost;
-        private static int MySqlPort;
-        private static string MySqlUser;
-        private static string MySqlPass;
-        private static string MySqlDatabase;
         private static string MySqlMonthlyTable;
         private static string MySqlDayfileTable;
 
@@ -47,13 +42,17 @@ namespace ExportToMySQL
 
             IniFile ini = new IniFile("Cumulus.ini");
 
-            MySqlHost = ini.GetValue("MySQL", "Host", "127.0.0.1");
-            MySqlPort = ini.GetValue("MySQL", "Port", 3306);
-            MySqlUser = ini.GetValue("MySQL", "User", "");
-            MySqlPass = ini.GetValue("MySQL", "Pass", "");
-            MySqlDatabase = ini.GetValue("MySQL", "Database", "database");
             MySqlMonthlyTable = ini.GetValue("MySQL", "MonthlyTable", "Monthly");
             MySqlDayfileTable = ini.GetValue("MySQL", "DayfileTable", "Dayfile");
+
+            MySqlConnectionStringBuilder ConnString = new MySqlConnectionStringBuilder()
+            {
+                Server = ini.GetValue("MySQL", "Host", "127.0.0.1"),
+                Port = (uint)ini.GetValue("MySQL", "Port", 3306),
+                UserID = ini.GetValue("MySQL", "User", ""),
+                Password = ini.GetValue("MySQL", "Pass", ""),
+                Database = ini.GetValue("MySQL", "Database", "database")
+            };
 
             if (File.Exists("strings.ini"))
             {
@@ -78,7 +77,7 @@ namespace ExportToMySQL
 
             try
             {
-                mySqlConn = new MySqlConnection($"server={MySqlHost};port={MySqlPort};user={MySqlUser};password={MySqlPass};database={MySqlDatabase}");
+                mySqlConn = new MySqlConnection(ConnString.ToString());
             }
             catch (Exception ex)
             {
