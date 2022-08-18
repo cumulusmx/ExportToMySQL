@@ -1,3 +1,11 @@
+ver 1.6.0
+—————————
+- Updated for Cumulus MX v 3.20.0+, now has 24 hour rainfall values
+
+ver 1.5.0
+—————————
+- Updated libraries to match Cumulus MX v3.18.0+
+
 ver 1.4.0
 —————————
 - Updated to .Net Framework 4.8 to match Cumulus MX v3.14.0+
