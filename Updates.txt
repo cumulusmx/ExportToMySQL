@@ -1,3 +1,7 @@
+ver 1.7.0
+—————————
+- Updated libraries to match Cumulus MX v3.23.0+
+
 ver 1.6.0
 —————————
 - Updated for Cumulus MX v 3.20.0+, now has 24 hour rainfall values
