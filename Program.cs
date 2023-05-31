@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -203,6 +204,7 @@ namespace ExportToMySQL
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
+                        Console.WriteLine("SQL = " + sb.ToString() + "\n");
                     }
                 } while (!(sr.EndOfStream));
             }
@@ -247,9 +249,11 @@ namespace ExportToMySQL
 
                     do
                     {
-                        // now process each record in the file
-                        try
-                        {
+						// now process each record in the file
+						StringBuilder sb = new StringBuilder(StartOfDayfileInsertSQL + " Values(");
+
+						try
+						{
                             var line = sr.ReadLine();
                             linenum++;
                             var st = new List<string>(Regex.Split(line, CultureInfo.CurrentCulture.TextInfo.ListSeparator));
@@ -262,7 +266,7 @@ namespace ExportToMySQL
 
                             Console.Write(sqldate + "\r");
 
-                            StringBuilder sb = new StringBuilder(StartOfDayfileInsertSQL + " Values('" + sqldate + "',");
+                            sb.Append($"'{sqldate}',");
 
                             for (int i = 1; i < 55; i++)
                             {
@@ -295,6 +299,7 @@ namespace ExportToMySQL
                         catch (Exception ex)
                         {
                             Console.WriteLine(ex.Message);
+                            Console.WriteLine("SQL = " + sb.ToString() + "\n");
                         }
                     } while (!(sr.EndOfStream));
                 }
