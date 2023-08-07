@@ -27,7 +27,7 @@ namespace ExportToMySQL
             if (args.Length == 0)
             {
                 Console.WriteLine("Specify 'dayfile', 'monthly', or the path to a monthly log file");
-                Environment.Exit(0);
+                Environment.Exit(1);
             }
             else
             {
@@ -38,7 +38,7 @@ namespace ExportToMySQL
             if (!File.Exists("Cumulus.ini"))
             {
                 Console.WriteLine("Cannot find Cumulus.ini");
-                Environment.Exit(0);
+                Environment.Exit(1);
             }
 
             IniFile ini = new IniFile("Cumulus.ini");
@@ -53,6 +53,33 @@ namespace ExportToMySQL
                 UserID = ini.GetValue("MySQL", "User", ""),
                 Password = ini.GetValue("MySQL", "Pass", ""),
                 Database = ini.GetValue("MySQL", "Database", "database")
+            };
+
+            try
+            {
+                mySqlConn = new MySqlConnection(ConnString.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error encountered opening MySQL connection");
+                Console.WriteLine(ex.Message);
+				Environment.Exit(1);
+            }
+
+            try
+            {
+                mySqlConn.Open();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error encountered opening MySQL connection");
+                Console.WriteLine(ex.Message);
+				Environment.Exit(1);
+            }
+
+            cmd = new MySqlCommand
+            {
+                Connection = mySqlConn
             };
 
             if (File.Exists("strings.ini"))
@@ -75,34 +102,6 @@ namespace ExportToMySQL
                 compassp[14] = iniStrs.GetValue("Compass", "NW", "NW");
                 compassp[15] = iniStrs.GetValue("Compass", "NNW", "NNW");
             }
-
-            try
-            {
-                mySqlConn = new MySqlConnection(ConnString.ToString());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error encountered opening MySQL connection");
-                Console.WriteLine(ex.Message);
-                Environment.Exit(0);
-            }
-
-            cmd = new MySqlCommand
-            {
-                Connection = mySqlConn
-            };
-
-            try
-            {
-                mySqlConn.Open();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error encountered opening MySQL connection");
-                Console.WriteLine(ex.Message);
-                Environment.Exit(0);
-            }
-
 
             if (param.ToLower().Equals("dayfile"))
             {
@@ -131,6 +130,8 @@ namespace ExportToMySQL
 
         private static void DoSingleMonthlyExport(string filename)
         {
+            Console.WriteLine("Processing file:" + filename);
+
             var StartOfMonthlyInsertSQL = "INSERT IGNORE INTO " + MySqlMonthlyTable + " (LogDateTime,Temp,Humidity,Dewpoint,Windspeed,Windgust,Windbearing,RainRate,TodayRainSoFar,Pressure,Raincounter,InsideTemp,InsideHumidity,LatestWindGust,WindChill,HeatIndex,UVindex,SolarRad,Evapotrans,AnnualEvapTran,ApparentTemp,MaxSolarRad,HrsSunShine,CurrWindBearing,RG11rain,RainSinceMidnight,FeelsLike,Humidex,WindbearingSym,CurrWindBearingSym)";
 
             using (var sr = new StreamReader(filename))
@@ -138,20 +139,28 @@ namespace ExportToMySQL
                 const int MaxBatchSize = 1000;
                 StringBuilder sb = new StringBuilder("", MaxBatchSize * 2100);
 
-                int linenum = 0;
+                var linenum = 0;
+                var line = string.Empty;
+
                 do
                 {
                     sb.Clear();
-                    sb.Append(StartOfMonthlyInsertSQL + " Values ");
+                    sb.Append(StartOfMonthlyInsertSQL + " VALUES ");
 
                     // now process each record in the file
                     try
                     {
                         for (int a = 0; a < MaxBatchSize && !(sr.EndOfStream); a++)
                         {
-                            var line = sr.ReadLine();
+                            line = sr.ReadLine();
                             linenum++;
                             var st = new List<string>(Regex.Split(line, CultureInfo.CurrentCulture.TextInfo.ListSeparator));
+
+                            if (st.Count < 16)
+                            {
+                                Console.WriteLine($"Error: Line {linenum} is too short. Detected {st.Count} fields present, but 16 is the minimum");
+                                continue;
+                            }
 
                             var logfiledate = st[0];
                             // 01234567
@@ -203,10 +212,12 @@ namespace ExportToMySQL
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine("Error processing line " + linenum);
                         Console.WriteLine(ex.Message);
-                        Console.WriteLine("SQL = " + sb.ToString() + "\n");
-                    }
-                } while (!(sr.EndOfStream));
+						Console.WriteLine("SQL = " + sb.ToString());
+						Console.WriteLine("Src = " + line + "\n");
+					}
+				} while (!(sr.EndOfStream));
             }
         }
 
@@ -241,7 +252,8 @@ namespace ExportToMySQL
                 Console.WriteLine("Dayfile exists, beginning export");
                 string StartOfDayfileInsertSQL = "INSERT IGNORE INTO " + MySqlDayfileTable + " (LogDate,HighWindGust,HWindGBear,THWindG,MinTemp,TMinTemp,MaxTemp,TMaxTemp,MinPress,TMinPress,MaxPress,TMaxPress,MaxRainRate,TMaxRR,TotRainFall,AvgTemp,TotWindRun,HighAvgWSpeed,THAvgWSpeed,LowHum,TLowHum,HighHum,THighHum,TotalEvap,HoursSun,HighHeatInd,THighHeatInd,HighAppTemp,THighAppTemp,LowAppTemp,TLowAppTemp,HighHourRain,THighHourRain,LowWindChill,TLowWindChill,HighDewPoint,THighDewPoint,LowDewPoint,TLowDewPoint,DomWindDir,HeatDegDays,CoolDegDays,HighSolarRad,THighSolarRad,HighUV,THighUV,MaxFeelsLike,TMaxFeelsLike,MinFeelsLike,TMinFeelsLike,MaxHumidex,TMaxHumidex,ChillHours,HighRain24h,THighRain24h,HWindGBearSym,DomWindDirSym)";
 
-                int linenum = 0;
+                var linenum = 0;
+                var line = string.Empty;
 
                 using (var sr = new StreamReader(filename))
                 {
@@ -251,10 +263,9 @@ namespace ExportToMySQL
                     {
 						// now process each record in the file
 						StringBuilder sb = new StringBuilder(StartOfDayfileInsertSQL + " Values(");
-
 						try
 						{
-                            var line = sr.ReadLine();
+                            line = sr.ReadLine();
                             linenum++;
                             var st = new List<string>(Regex.Split(line, CultureInfo.CurrentCulture.TextInfo.ListSeparator));
 
@@ -299,13 +310,18 @@ namespace ExportToMySQL
                         catch (Exception ex)
                         {
                             Console.WriteLine(ex.Message);
-                            Console.WriteLine("SQL = " + sb.ToString() + "\n");
+                            Console.WriteLine("SQL = " + sb.ToString());
+                            Console.WriteLine("Src = " + line + "\n");
                         }
                     } while (!(sr.EndOfStream));
                 }
 
                 Console.WriteLine();
                 Console.WriteLine(linenum+" entries processed");
+            }
+            else
+            {
+                Console.WriteLine("Dafile not found - " + filename);
             }
         }
 
