@@ -48,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -76,7 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MySqlConnector">
-      <Version>2.2.5</Version>
+      <Version>2.2.7</Version>
     </PackageReference>
     <PackageReference Include="System.Diagnostics.DiagnosticSource">
       <Version>7.0.2</Version>
