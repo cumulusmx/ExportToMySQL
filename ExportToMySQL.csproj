@@ -87,12 +87,14 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo.
+    <PostBuildEvent>if $(ConfigurationName)==Release (
+echo.
 echo Update Distribution folder
 echo copy MX exe
 xcopy "$(TargetPath)" "$(SolutionDir)..\CumulusMX-Dist\CumulusMX" /D /-I /Q /Y
 echo copy MX config
-xcopy "$(TargetPath).config" "$(SolutionDir)..\CumulusMX-Dist\CumulusMX" /D /-I /Q /Y</PostBuildEvent>
+xcopy "$(TargetPath).config" "$(SolutionDir)..\CumulusMX-Dist\CumulusMX" /D /-I /Q /Y
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
