@@ -79,10 +79,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MySqlConnector">
-      <Version>2.2.7</Version>
+      <Version>2.3.3</Version>
     </PackageReference>
     <PackageReference Include="System.Diagnostics.DiagnosticSource">
-      <Version>7.0.2</Version>
+      <Version>8.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

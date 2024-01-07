@@ -1,3 +1,21 @@
+
+ver 1.10.0
+——————————
+- Support for CMX version 3.28.2
+
+ver 1.9.0
+—————————
+- Support for CMX version 3.26.0
+- Additional logging
+
+ver 1.8.1
+—————————
+- Add support for CMX version 3.25.0 or later
+
+ver 1.8.0
+—————————
+- Support for Cumulus MX v3.2.40 or later with 32/64 bit capability
+
 ver 1.7.0
 —————————
 - Updated libraries to match Cumulus MX v3.23.0+
