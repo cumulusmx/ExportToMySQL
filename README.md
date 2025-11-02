@@ -8,7 +8,7 @@ It will read various parameters from your Cumulus.ini file, for example the MySQ
 ## Command Line Parameters
 **monthly** - this will export all the monthly logs ExportToMySQL finds in your /data folder to your MySQL server
 
-**dayfile** - this will your dayfile.txt to your MySQL server
+**dayfile** - this will export your dayfile.txt to your MySQL server
 
 **data/<monthlyfilename>** - this will import a single named monthly log file to your MySQL server
   
@@ -23,8 +23,8 @@ It will read various parameters from your Cumulus.ini file, for example the MySQ
 
 Linux examples:
  
- `> mono ExportToMySQL.exe monthly`
+ `> dotnet ExportToMySQL.exe monthly`
  
- `> mono ExportToMySQL.exe dayfile`
+ `> dotnet ExportToMySQL.exe dayfile`
  
- `> mono ExportToMySQL.exe data/Feb21log.txt`
+ `> dotnet ExportToMySQL.exe data/Feb21log.txt`
