@@ -23,8 +23,8 @@ It will read various parameters from your Cumulus.ini file, for example the MySQ
 
 Linux examples:
  
- `> dotnet ExportToMySQL.exe monthly`
+ `> dotnet ExportToMySQL.dll monthly`
  
- `> dotnet ExportToMySQL.exe dayfile`
+ `> dotnet ExportToMySQL.dll dayfile`
  
- `> dotnet ExportToMySQL.exe data/Feb21log.txt`
+ `> dotnet ExportToMySQL.dll data/Feb21log.txt`
